@@ -7,6 +7,9 @@
 #include "decode_macros.h"
 #include <cassert>
 
+// my addition
+#include "sim.h"
+
 static void commit_log_reset(processor_t* p)
 {
   p->get_state()->log_reg_write.clear();
@@ -73,6 +76,20 @@ static void commit_log_print_insn(processor_t *p, reg_t pc, insn_t insn)
 
   // print core id on all lines so it is easy to grep
   fprintf(log_file, "core%4" PRId32 ": ", p->get_id());
+
+
+  // So to print all the registers when in debug mode at each commited instruction
+  fprintf(log_file, "\n");
+  for (int r = 0; r < NXPR; ++r) {
+    
+    fprintf(log_file, "%s: ", xpr_name[r]);
+    commit_log_print_value(log_file, xlen, &p->get_state()->XPR[r]);
+    fprintf(log_file, " ");
+    if ((r + 1) % 4 == 0)
+      fprintf(log_file, "\n");
+  }
+  
+  fprintf(log_file, "\n");
 
   fprintf(log_file, "%1d ", priv);
   commit_log_print_value(log_file, xlen, pc);
